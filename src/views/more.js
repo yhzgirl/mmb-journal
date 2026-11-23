@@ -5,6 +5,7 @@ import { THEMES, SIZES, LEADINGS, settings, applySettings } from '../settings.js
 import { getMedia, storageUse, keepStorage } from '../store.js';
 import { writeJournalZip } from '../backup-zip.js';
 import { paths } from '../format.js';
+import { lockOn, chooseNewPin, confirmCurrentPin, turnOff } from '../lock.js';
 
 export default async function moreView(main) {
   main.append(pageHead('More'));
@@ -34,6 +35,25 @@ export default async function moreView(main) {
       exportBtn,
       h('a', { href: '#/bin' }, h('span', { class: 'row' }, icon('bin'), 'Bin'), h('span', { class: 'muted small' }, `${journal.binned().length} entries`))));
 
+  // PIN lock
+  const pinBox = h('div', { class: 'card list' });
+  const drawPin = () => pinBox.replaceChildren(...(lockOn() ? [
+    h('div', { class: 'item' }, h('span', { class: 'row' }, icon('lock'), 'PIN lock'), h('span', {}, 'On')),
+    h('button', { onclick: async () => {
+      if (await confirmCurrentPin() && await chooseNewPin({ heading: 'Choose a new PIN' })) toast('PIN changed');
+      drawPin();
+    } }, 'Change PIN'),
+    h('button', { onclick: async () => {
+      if (await confirmCurrentPin('Enter your PIN to turn the lock off')) { await turnOff(); toast('PIN lock turned off'); }
+      drawPin();
+    } }, 'Turn off PIN lock')
+  ] : [
+    h('button', { onclick: async () => { if (await chooseNewPin()) toast('PIN lock is on'); drawPin(); } },
+      h('span', { class: 'row' }, icon('lock'), 'Turn on PIN lock'), h('span', { class: 'muted small' }, 'Asked for every time you open it'))
+  ]));
+  drawPin();
+  main.append(h('h2', { class: 'section-title' }, 'Privacy'), pinBox);
+
   const use = await storageUse();
   const kept = await keepStorage();
   main.append(h('h2', { class: 'section-title' }, 'On this phone'),
@@ -41,7 +61,7 @@ export default async function moreView(main) {
       h('div', { class: 'item' }, 'Entries', h('span', {}, String(journal.count()))),
       use ? h('div', { class: 'item' }, 'Space used', h('span', {}, `${(use.used / 1e6).toFixed(0)} MB`)) : null,
       h('div', { class: 'item' }, 'Protected from clean-up', h('span', {}, kept ? 'Yes' : 'Not yet'))),
-    h('p', { class: 'muted small', style: 'margin:16px 4px' }, 'Dropbox sync, passcode and fingerprint lock are coming next. Until then, your journal is only on this phone, so save a backup ZIP now and then.'));
+    h('p', { class: 'muted small', style: 'margin:16px 4px' }, 'Dropbox sync and fingerprint unlock are coming next. Until then, your journal is only on this phone, so save a backup ZIP now and then.'));
 }
 
 async function exportBackup(btn) {

@@ -71,3 +71,12 @@ export async function storageUse() {
   try { const e = await navigator.storage.estimate(); return { used: e.usage || 0, quota: e.quota || 0 }; }
   catch { return null; }
 }
+
+/** Deletes the journal, photos and settings on this phone (used when the PIN is forgotten). */
+export async function eraseEverything() {
+  if (dbPromise) { (await dbPromise).close(); dbPromise = null; }
+  await new Promise((resolve, reject) => {
+    const r = indexedDB.deleteDatabase(DB_NAME);
+    r.onsuccess = resolve; r.onblocked = resolve; r.onerror = () => reject(r.error);
+  });
+}

@@ -25,6 +25,7 @@ It's plain files with no build step. Serve the folder over HTTP, for example `py
 - **Import**: a Journey backup or an MMB Journal backup ZIP, read on the phone with a summary before anything is saved.
 - **Backup**: saves the whole journal as an MMB Journal backup ZIP.
 - **Look**: four themes (Paper and Lilac, light; Midnight and Ink, dark) or Auto, plus text size and line spacing.
+- **PIN lock** (4 to 8 digits): asked for every time the app opens or comes back from the background, but not after choosing a photo or file. Only a salted hash of the PIN is stored. After 5 wrong tries there's a wait, starting at 30 seconds and doubling up to 15 minutes. If the PIN is forgotten, the only way in is to erase the journal on the phone and import a backup. It keeps people out of the app but doesn't encrypt the entries; that comes with v0.2.
 - **Offline**: opens from the copy saved on the phone and updates in the background.
 
 ## Files
@@ -37,6 +38,7 @@ It's plain files with no build step. Serve the folder over HTTP, for example `py
 | `src/journal.js` | The journal in memory: saving, the bin, On This Day, days and tags. |
 | `src/store.js` | The copy on the phone (IndexedDB), with media stored under their journal paths. |
 | `src/format.js` | The entry format (v1) and validation. See `journal-format.md`. |
+| `src/lock.js` | The PIN lock: lock screen, choosing and changing the PIN, and locking when the app goes to the background. |
 | `src/rich-text.js` | The editor set-up, shared by reading and editing. |
 | `src/views/*.js` | One file per page. |
 | `src/import/journey.js` | Journey backup → entries. |
@@ -48,4 +50,4 @@ It's plain files with no build step. Serve the folder over HTTP, for example `py
 
 ## Next (v0.2)
 
-Dropbox sync, encrypted on the phone with one journal key that the passcode, fingerprint and recovery key can each unlock; passcode lock and auto-lock; automatic weather and place names; mood tracker and stats; font choice including OpenDyslexic.
+Dropbox sync, encrypted on the phone with one journal key that the PIN, fingerprint and recovery key can each unlock; fingerprint unlock; automatic weather and place names; mood tracker and stats; font choice including OpenDyslexic.

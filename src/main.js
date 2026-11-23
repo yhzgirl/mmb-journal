@@ -5,6 +5,7 @@
 import * as journal from './journal.js';
 import { h, icon } from './ui.js';
 import { applySettings } from './settings.js';
+import { startLock } from './lock.js';
 
 const routes = {
   '': () => import('./views/timeline.js'),
@@ -67,6 +68,7 @@ function updateNav(name) {
 
 (async function start() {
   await applySettings();
+  await startLock();             // the PIN comes before anything from the journal is shown
   document.body.append(nav());
   try { await journal.load(); }
   catch (e) { main.replaceChildren(h('p', { class: 'empty' }, 'The journal could not be opened on this phone: ' + e.message)); return; }
