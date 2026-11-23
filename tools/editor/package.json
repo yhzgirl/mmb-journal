@@ -1,0 +1,11 @@
+{
+  "name": "mmb-journal-editor-bundle",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "@tiptap/core": "3.32.2", "@tiptap/pm": "3.32.2", "@tiptap/starter-kit": "3.32.2",
+    "@tiptap/extension-table": "3.32.2", "@tiptap/extension-list": "3.32.2", "@tiptap/extension-text-style": "3.32.2",
+    "@tiptap/extension-highlight": "3.32.2", "@tiptap/extension-image": "3.32.2", "@tiptap/extensions": "3.32.2"
+  }
+}
