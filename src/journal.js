@@ -2,11 +2,15 @@
 // still only a few MB), so the timeline, calendar, On This Day and search are instant.
 
 import * as store from './store.js';
-import { localDay, previewText, paths } from './format.js';
+import { localDay, previewText, paths, newId } from './format.js';
 import { makeThumb, forgetUrls } from './ui.js';
 
 const BIN_DAYS = 30;
 let entries = [];
+
+// Sync listens for changes (set up by sync.js before the journal loads).
+let hooks = { changed() {}, destroyed() {} };
+export const setSyncHooks = h => { hooks = h; };
 const plain = new Map();   // id → plain text, for search
 
 export async function load() {
@@ -43,24 +47,27 @@ export async function save(entry, { newMedia = [], removed = [] } = {}) {
   const i = entries.findIndex(e => e.id === entry.id);
   if (i >= 0) entries[i] = entry; else entries.push(entry);
   plain.delete(entry.id);
+  hooks.changed(entry.id);
   store.keepStorage();
 }
 
 export async function moveToBin(id) {
   const e = get(id); if (!e) return;
-  await save({ ...e, deleted: new Date().toISOString() });
+  const now = new Date().toISOString();
+  await save({ ...e, deleted: now, updated: now });
 }
 export async function restore(id) {
   const e = get(id); if (!e) return;
-  await save({ ...e, deleted: null });
+  await save({ ...e, deleted: null, updated: new Date().toISOString() });
 }
-export async function destroy(id) {
+export async function destroy(id, { fromSync = false } = {}) {
   const e = get(id) || entries.find(x => x.id === id);
   if (!e) return;
   e.media.forEach(m => forgetUrls(paths.media(e.id, m.file)));
   await store.destroyEntry(e);
   entries = entries.filter(x => x.id !== id);
   plain.delete(id);
+  if (!fromSync) hooks.destroyed(id);
 }
 
 /** Adds imported entries (replacing any with the same ID) with their photos. */
@@ -80,6 +87,7 @@ export async function addImported(list, files, onProgress = () => {}) {
     const i = entries.findIndex(x => x.id === e.id);
     if (i >= 0) entries[i] = e; else entries.push(e);
     plain.delete(e.id);
+    hooks.changed(e.id);
     onProgress(++done, total);
   }
   await store.keepStorage();
@@ -116,4 +124,26 @@ export function tagCounts() {
 }
 
 export const count = () => live().length;
+export const all = () => entries.slice();
+
+/** An entry that arrived from Dropbox (already encrypted as `bytes`). Removes photos it no longer has. */
+export async function putFromSync(entry, bytes) {
+  const old = get(entry.id);
+  if (old) {
+    const gone = old.media.filter(m => !entry.media.some(n => n.file === m.file)).map(m => paths.media(old.id, m.file));
+    gone.forEach(forgetUrls);
+    if (gone.length) await store.deleteMedia(gone);
+  }
+  await store.putEntryFile(entry.id, bytes);
+  const i = entries.findIndex(e => e.id === entry.id);
+  if (i >= 0) entries[i] = entry; else entries.push(entry);
+  plain.delete(entry.id);
+}
+
+/** When the same entry was changed in two places, the other version is kept in the bin. */
+export async function keepConflictCopy(entry) {
+  const now = new Date().toISOString();
+  await save({ ...entry, id: newId(), media: [], deleted: now, updated: now,
+    source: { app: 'MMB Journal', conflictOf: entry.id, note: 'Another version of this entry, kept when it was changed in two places at once. Photos stay with the main entry.' } });
+}
 export const allForBackup = () => entries.slice().sort(byNewest);

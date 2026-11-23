@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en-GB" data-theme="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Open an encrypted journal</title>
+  <meta name="description" content="Turns an encrypted MMB Journal folder from Dropbox back into plain files, using the recovery key. Works offline; nothing is uploaded.">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles/app.css">
+  <style>
+    body { padding: 24px 16px 48px; max-width: 640px; margin: 0 auto; }
+    h1 { color: var(--heading); font-size: 1.6rem; margin: 8px 0 12px; }
+    ol { padding-left: 1.2em; } li { margin: 6px 0; }
+    .card { padding: 16px; margin: 16px 0; }
+    #out p { margin: 6px 0; }
+    .error { color: var(--danger); font-weight: 600; }
+  </style>
+  <script type="module" src="src/decrypt.js"></script>
+</head>
+<body>
+  <h1>Open an encrypted journal</h1>
+  <p>This page turns the encrypted journal in your Dropbox back into plain files: a normal MMB Journal backup ZIP with readable entries, photos and videos. It works offline, and nothing leaves this device.</p>
+  <ol>
+    <li>In Dropbox, open <strong>Apps</strong>, then download the <strong>MMB Journal</strong> folder (Dropbox gives you a ZIP).</li>
+    <li>Choose that ZIP below and type your recovery key.</li>
+    <li>Save the plain backup it makes. It isn't encrypted, so keep it somewhere safe.</li>
+  </ol>
+  <div class="card">
+    <div class="field"><label for="zip">Dropbox download (ZIP)</label><input type="file" id="zip" accept=".zip,application/zip" class="input"></div>
+    <div class="field"><label for="key">Recovery key</label><input type="text" id="key" class="input recovery-input" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX"></div>
+    <button type="button" class="btn" id="go" disabled>Open and save plain backup</button>
+  </div>
+  <div id="out" role="status" aria-live="polite"></div>
+</body>
+</html>

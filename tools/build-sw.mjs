@@ -7,7 +7,7 @@ import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const include = ['index.html', 'manifest.json', 'styles', 'src', 'icons', 'fonts'];
+const include = ['index.html', 'decrypt.html', 'manifest.json', 'styles', 'src', 'icons', 'fonts'];
 const skip = /(LICENSE|\.md|\.txt)$/;
 const files = [];
 const walk = p => statSync(p).isDirectory() ? readdirSync(p).sort().forEach(f => walk(join(p, f))) : files.push(p);
