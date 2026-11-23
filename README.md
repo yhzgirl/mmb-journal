@@ -1,6 +1,8 @@
 # MMB Journal app
 
-Michelle's own journal: a home-screen web app (Brave on Android) over a folder of plain JSON files in Dropbox. The file format is described in [`../journal-format.md`](../journal-format.md).
+Michelle's own journal: a home-screen web app (Brave on Android) over a folder of plain JSON files in Dropbox. The file format is described in `journal-format.md`, next to this folder.
+
+Live at https://yhzgirl.github.io/mmb-journal/. Install it from Brave's menu with **Install app**.
 
 ## Running it
 
@@ -34,7 +36,7 @@ It's plain files with no build step. Serve the folder over HTTP, for example `py
 | `src/main.js` | Start-up, bottom navigation and page router. |
 | `src/journal.js` | The journal in memory: saving, the bin, On This Day, days and tags. |
 | `src/store.js` | The copy on the phone (IndexedDB), with media stored under their journal paths. |
-| `src/format.js` | The entry format (v1) and validation. See [`../journal-format.md`](../journal-format.md). |
+| `src/format.js` | The entry format (v1) and validation. See `journal-format.md`. |
 | `src/rich-text.js` | The editor set-up, shared by reading and editing. |
 | `src/views/*.js` | One file per page. |
 | `src/import/journey.js` | Journey backup → entries. |
